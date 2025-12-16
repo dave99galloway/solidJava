@@ -43,11 +43,23 @@ sourceSets {
         compileClasspath += main.output
         runtimeClasspath += main.output
     }
+    acceptanceTest {
+        java {
+            srcDirs = ['src/acceptanceTest/java']
+        }
+        resources {
+            srcDirs = ['src/acceptanceTest/resources']
+        }
+        compileClasspath += main.output
+        runtimeClasspath += main.output + test.output
+    }
 }
 
 configurations {
     cucumberImplementation.extendsFrom implementation
     cucumberRuntimeOnly.extendsFrom runtimeOnly
+    acceptanceTestImplementation.extendsFrom testImplementation
+    acceptanceTestRuntimeOnly.extendsFrom testRuntimeOnly
 }
 
 dependencies {
@@ -120,6 +132,23 @@ task unitTest(type: Test) {
     }
 }
 
+// Task to run acceptance tests
+task acceptanceTest(type: Test) {
+    description = 'Run acceptance tests'
+    group = 'verification'
+    
+    testClassesDirs = sourceSets.acceptanceTest.output.classesDirs
+    classpath = sourceSets.acceptanceTest.runtimeClasspath
+    
+    useJUnitPlatform()
+    
+    testLogging {
+        events "passed", "skipped", "failed"
+        exceptionFormat "full"
+        showStandardStreams true
+    }
+}
+
 tasks.named('check') {
-    dependsOn cucumber, unitTest
+    dependsOn cucumber, unitTest, acceptanceTest
 }
