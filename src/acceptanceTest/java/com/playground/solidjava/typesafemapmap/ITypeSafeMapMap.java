@@ -70,16 +70,17 @@ public interface ITypeSafeMapMap {
     <K, V> Map<K, V> allOfType(@Nonnull Class<V> type);
 
     /**
-     * Execute an action for each value of a specific type.
+     * Map each value of a specific type through an action function.
      * 
      * @param type   the type to iterate over (must not be null)
-     * @param action the action to apply to each value (must not be null)
+     * @param action the mapping function to apply to each value (must not be null)
      * @param <V>    the type of the values
-     * @param <R>    the return type of the action
-     * @return a list of results from applying the action (never null)
+     * @param <R>    the return type of the mapping function
+     * @return a list of results from applying the mapping function to each value
+     *         (never null)
      */
     @Nonnull
-    <V, R> List<R> forEach(@Nonnull Class<V> type, @Nonnull ValueAction<V, R> action);
+    <V, R> List<R> mapValues(@Nonnull Class<V> type, @Nonnull ValueAction<V, R> action);
 
     /**
      * Map over entries of a specific type.

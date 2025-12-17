@@ -2,7 +2,6 @@ package com.playground.solidjava.typesafemapmap;
 
 import javax.annotation.Nonnull;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -90,17 +89,6 @@ public class TypeSafeMapMap implements ITypeSafeMapMap {
         return (V) value;
     }
 
-    /**
-     * Retrieves all entries from the map that are associated with the specified
-     * value type.
-     * 
-     * @param <K>  the type of keys in the returned map
-     * @param <V>  the type of values in the returned map
-     * @param type the class representing the value type to retrieve
-     * @return an unmodifiable map containing all entries of the specified type,
-     *         or an empty map if no entries of that type exist
-     * @throws NullPointerException if {@code type} is null
-     */
     @Override
     @SuppressWarnings({ "unchecked", "null" })
     @Nonnull
@@ -108,17 +96,6 @@ public class TypeSafeMapMap implements ITypeSafeMapMap {
         return Collections.unmodifiableMap((Map<K, V>) map.getOrDefault(type, Collections.emptyMap()));
     }
 
-    /**
-     * Retrieves a mutable copy of all entries associated with the specified type.
-     * 
-     * @param <K>  the type of keys in the returned map
-     * @param <V>  the type of values in the returned map
-     * @param type the class representing the value type to retrieve entries for
-     * @return a mutable defensive copy of the entries for the given type,
-     *         or an empty map if no entries exist for the specified type.
-     *         Changes to the returned map will not affect the internal state.
-     * @throws NullPointerException if type is null
-     */
     @Override
     @SuppressWarnings("unchecked")
     @Nonnull
@@ -127,31 +104,23 @@ public class TypeSafeMapMap implements ITypeSafeMapMap {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "null" })
     @Nonnull
-    public <V, R> List<R> forEach(@Nonnull Class<V> type, @Nonnull ValueAction<V, R> action) {
-        List<R> results = new ArrayList<>();
-        Map<?, V> entries = (Map<?, V>) map.get(type);
-        if (entries != null) {
-            for (V value : entries.values()) {
-                results.add(action.apply(value));
-            }
-        }
-        return results;
+    public <V, R> List<R> mapValues(@Nonnull Class<V> type, @Nonnull ValueAction<V, R> action) {
+        return ((Map<?, V>) map.getOrDefault(type, Collections.emptyMap()))
+                .values().stream()
+                .map(action::apply)
+                .toList();
     }
 
     @Override
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "null" })
     @Nonnull
     public <V, R> List<R> mapEntries(@Nonnull Class<V> type, @Nonnull EntryAction<V, R> action) {
-        List<R> results = new ArrayList<>();
-        Map<?, V> entries = (Map<?, V>) map.get(type);
-        if (entries != null) {
-            for (Map.Entry<?, V> entry : entries.entrySet()) {
-                results.add(action.apply(entry));
-            }
-        }
-        return results;
+        return ((Map<?, V>) map.getOrDefault(type, Collections.emptyMap()))
+                .entrySet().stream()
+                .map(action::apply)
+                .toList();
     }
 
     @Override
