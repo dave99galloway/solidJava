@@ -35,10 +35,9 @@ public class TypeSafeMapMap implements ITypeSafeMapMap {
     @Override
     @SuppressWarnings("unchecked")
     public <K, V> void put(@Nonnull K key, @Nonnull V value, @Nonnull Class<V> storageType) {
-        Type valueType = storageType;
 
         // If key already exists with a different type, remove the old entry
-        keyToType.merge(key, valueType, (existingType, newType) -> {
+        keyToType.merge(key, storageType, (existingType, newType) -> {
             if (!existingType.equals(newType)) {
                 map.computeIfPresent(existingType, (type, oldSubmap) -> {
                     ((Map<K, ?>) oldSubmap).remove(key);
@@ -49,7 +48,7 @@ public class TypeSafeMapMap implements ITypeSafeMapMap {
         });
 
         // Get or create the submap for this type
-        Map<K, V> submap = (Map<K, V>) map.computeIfAbsent(valueType, k -> new ConcurrentHashMap<>());
+        Map<K, V> submap = (Map<K, V>) map.computeIfAbsent(storageType, k -> new ConcurrentHashMap<>());
         submap.put(key, value);
     }
 
@@ -65,35 +64,35 @@ public class TypeSafeMapMap implements ITypeSafeMapMap {
         return validators.requireValue(key);
     }
 
+    @SuppressWarnings({ "null", "unchecked" })
     @Override
-    @SuppressWarnings({ "unchecked", "null" })
     @Nonnull
     public <K, V> Map<K, V> allOfType(@Nonnull Class<V> type) {
-        return Collections.unmodifiableMap((Map<K, V>) map.getOrDefault(type, Collections.emptyMap()));
+        return Collections.unmodifiableMap((Map<K, V>) getOrEmptySubmap(type));
     }
 
-    @Override
     @SuppressWarnings("unchecked")
+    @Override
     @Nonnull
     public <K, V> Map<K, V> mutableEntriesOfType(@Nonnull Class<V> type) {
-        return new ConcurrentHashMap<>((Map<K, V>) map.getOrDefault(type, Collections.emptyMap()));
+        return new ConcurrentHashMap<>((Map<K, V>) getOrEmptySubmap(type));
     }
 
+    @SuppressWarnings({ "null", "unchecked" })
     @Override
-    @SuppressWarnings({ "unchecked", "null" })
     @Nonnull
     public <V, R> List<R> mapValues(@Nonnull Class<V> type, @Nonnull ValueAction<V, R> action) {
-        return ((Map<?, V>) map.getOrDefault(type, Collections.emptyMap()))
+        return ((Map<?, V>) getOrEmptySubmap(type))
                 .values().stream()
                 .map(action::apply)
                 .toList();
     }
 
+    @SuppressWarnings({ "null", "unchecked" })
     @Override
-    @SuppressWarnings({ "unchecked", "null" })
     @Nonnull
     public <V, R> List<R> mapEntries(@Nonnull Class<V> type, @Nonnull EntryAction<V, R> action) {
-        return ((Map<?, V>) map.getOrDefault(type, Collections.emptyMap()))
+        return ((Map<?, V>) getOrEmptySubmap(type))
                 .entrySet().stream()
                 .map(action::apply)
                 .toList();
@@ -103,6 +102,12 @@ public class TypeSafeMapMap implements ITypeSafeMapMap {
     public void clear() {
         map.clear();
         keyToType.clear();
+    }
+
+    @SuppressWarnings({ "unchecked", "null" })
+    @Nonnull
+    private <V> Map<?, V> getOrEmptySubmap(Class<?> type) {
+        return (Map<?, V>) map.getOrDefault(type, Collections.emptyMap());
     }
 
     private class Validators {
