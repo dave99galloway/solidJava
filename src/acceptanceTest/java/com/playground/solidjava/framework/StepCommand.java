@@ -1,7 +1,13 @@
 package com.playground.solidjava.framework;
 
 /**
- * A step command encapsulates a test step (Given/When/Then/And/But).
+ * A step command encapsulates a test step (Given/When/Then/And/But) with its
+ * keyword.
+ * 
+ * This interface is typically used internally by the framework or when you need
+ * to decouple the keyword from the execution context. Most tests should
+ * implement
+ * StepAction instead.
  * 
  * Each command is responsible for:
  * 1. Declaring which step keyword it belongs to
@@ -11,27 +17,9 @@ package com.playground.solidjava.framework;
  * This pattern avoids string parsing and provides explicit, testable behavior
  * for each step of an acceptance test scenario.
  */
-public interface StepCommand {
-
+public interface StepCommand extends StepAction {
     /**
      * The step keyword this command belongs to (GIVEN, WHEN, THEN, AND, BUT).
      */
     StepKeyword keyword();
-
-    /**
-     * Execute the step logic.
-     * The command has full access to the test's StepContext for state management.
-     * 
-     * @param context Shared context for the scenario
-     * @throws Exception if the step fails
-     */
-    void execute(StepContext context) throws Exception;
-
-    /**
-     * Provide a human-readable description of this step.
-     * This is logged at INFO level by the framework along with the keyword.
-     * 
-     * @return description like "a calculator" or "I press add"
-     */
-    String description();
 }

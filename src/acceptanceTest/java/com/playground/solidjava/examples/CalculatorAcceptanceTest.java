@@ -1,9 +1,8 @@
 package com.playground.solidjava.examples;
 
 import com.playground.solidjava.framework.AcceptanceTest;
-import com.playground.solidjava.framework.StepCommand;
+import com.playground.solidjava.framework.StepAction;
 import com.playground.solidjava.framework.StepContext;
-import com.playground.solidjava.framework.StepKeyword;
 import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
 
@@ -51,12 +50,7 @@ public class CalculatorAcceptanceTest extends AcceptanceTest {
 
     // Command implementations
 
-    private class GivenCalculator implements StepCommand {
-        @Override
-        public StepKeyword keyword() {
-            return StepKeyword.GIVEN;
-        }
-
+    private class GivenCalculator implements StepAction {
         @Override
         public void execute(StepContext context) {
             calculator = new Calculator();
@@ -70,16 +64,11 @@ public class CalculatorAcceptanceTest extends AcceptanceTest {
         }
     }
 
-    private class GivenEnterNumber implements StepCommand {
+    private class GivenEnterNumber implements StepAction {
         private final int number;
 
         GivenEnterNumber(int number) {
             this.number = number;
-        }
-
-        @Override
-        public StepKeyword keyword() {
-            return StepKeyword.AND;
         }
 
         @Override
@@ -97,12 +86,7 @@ public class CalculatorAcceptanceTest extends AcceptanceTest {
         }
     }
 
-    private class WhenAdd implements StepCommand {
-        @Override
-        public StepKeyword keyword() {
-            return StepKeyword.WHEN;
-        }
-
+    private class WhenAdd implements StepAction {
         @Override
         public void execute(StepContext context) {
             int result = calculator.add();
@@ -118,12 +102,7 @@ public class CalculatorAcceptanceTest extends AcceptanceTest {
         }
     }
 
-    private class WhenSubtract implements StepCommand {
-        @Override
-        public StepKeyword keyword() {
-            return StepKeyword.WHEN;
-        }
-
+    private class WhenSubtract implements StepAction {
         @Override
         public void execute(StepContext context) {
             int result = calculator.subtract();
@@ -139,12 +118,7 @@ public class CalculatorAcceptanceTest extends AcceptanceTest {
         }
     }
 
-    private class WhenReset implements StepCommand {
-        @Override
-        public StepKeyword keyword() {
-            return StepKeyword.WHEN;
-        }
-
+    private class WhenReset implements StepAction {
         @Override
         public void execute(StepContext context) {
             calculator.reset();
@@ -159,16 +133,11 @@ public class CalculatorAcceptanceTest extends AcceptanceTest {
         }
     }
 
-    private class ThenResultIs implements StepCommand {
+    private class ThenResultIs implements StepAction {
         private final int expected;
 
         ThenResultIs(int expected) {
             this.expected = expected;
-        }
-
-        @Override
-        public StepKeyword keyword() {
-            return StepKeyword.THEN;
         }
 
         @Override
@@ -188,16 +157,11 @@ public class CalculatorAcceptanceTest extends AcceptanceTest {
         }
     }
 
-    private class ThenDisplayShows implements StepCommand {
+    private class ThenDisplayShows implements StepAction {
         private final int expected;
 
         ThenDisplayShows(int expected) {
             this.expected = expected;
-        }
-
-        @Override
-        public StepKeyword keyword() {
-            return StepKeyword.THEN;
         }
 
         @Override
