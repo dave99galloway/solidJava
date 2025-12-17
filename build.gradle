@@ -66,6 +66,7 @@ dependencies {
     // Main dependencies
     implementation 'org.slf4j:slf4j-api:2.0.9'
     implementation 'ch.qos.logback:logback-classic:1.4.11'
+    implementation 'com.google.code.findbugs:jsr305:3.0.2'
     
     // JUnit 5 dependencies
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.1'

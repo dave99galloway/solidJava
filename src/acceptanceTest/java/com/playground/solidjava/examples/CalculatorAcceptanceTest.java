@@ -10,7 +10,8 @@ import org.slf4j.LoggerFactory;
 import static org.assertj.core.api.Assertions.*;
 
 /**
- * Example acceptance test demonstrating the fluent DSL framework with Command pattern.
+ * Example acceptance test demonstrating the fluent DSL framework with Command
+ * pattern.
  * 
  * This test shows:
  * - Fluent Given/When/Then/And chaining with commands
@@ -20,67 +21,67 @@ import static org.assertj.core.api.Assertions.*;
  * - No string parsing or extraction
  */
 public class CalculatorAcceptanceTest extends AcceptanceTest {
-    
+
     private Calculator calculator;
-    
+
     @Test
     void shouldAddTwoPositiveNumbers() {
         given(new GivenCalculator())
-            .and(new GivenEnterNumber(5))
-            .and(new GivenEnterNumber(3))
-            .when(new WhenAdd())
-            .then(new ThenResultIs(8));
+                .and(new GivenEnterNumber(5))
+                .and(new GivenEnterNumber(3))
+                .when(new WhenAdd())
+                .then(new ThenResultIs(8));
     }
-    
+
     @Test
     void shouldSubtractNumbers() {
         given(new GivenCalculator())
-            .and(new GivenEnterNumber(10))
-            .and(new GivenEnterNumber(4))
-            .when(new WhenSubtract())
-            .then(new ThenResultIs(6));
+                .and(new GivenEnterNumber(10))
+                .and(new GivenEnterNumber(4))
+                .when(new WhenSubtract())
+                .then(new ThenResultIs(6));
     }
-    
+
     @Test
     void shouldHandleZero() {
         given(new GivenCalculator())
-            .when(new WhenReset())
-            .then(new ThenDisplayShows(0));
+                .when(new WhenReset())
+                .then(new ThenDisplayShows(0));
     }
-    
+
     // Command implementations
-    
+
     private class GivenCalculator implements StepCommand {
         @Override
         public StepKeyword keyword() {
             return StepKeyword.GIVEN;
         }
-        
+
         @Override
         public void execute(StepContext context) {
             calculator = new Calculator();
             context.put("calculator", calculator);
             LoggerFactory.getLogger(getClass()).debug("  └─ Calculator.create()");
         }
-        
+
         @Override
         public String description() {
             return "a calculator";
         }
     }
-    
+
     private class GivenEnterNumber implements StepCommand {
         private final int number;
-        
+
         GivenEnterNumber(int number) {
             this.number = number;
         }
-        
+
         @Override
         public StepKeyword keyword() {
             return StepKeyword.AND;
         }
-        
+
         @Override
         public void execute(StepContext context) {
             calculator.enter(number);
@@ -89,19 +90,19 @@ public class CalculatorAcceptanceTest extends AcceptanceTest {
             logger.debug("  └─ Calculator.enter({})", number);
             logger.debug("  → Number stored: {}", number);
         }
-        
+
         @Override
         public String description() {
             return "I enter " + number;
         }
     }
-    
+
     private class WhenAdd implements StepCommand {
         @Override
         public StepKeyword keyword() {
             return StepKeyword.WHEN;
         }
-        
+
         @Override
         public void execute(StepContext context) {
             int result = calculator.add();
@@ -110,19 +111,19 @@ public class CalculatorAcceptanceTest extends AcceptanceTest {
             logger.debug("  └─ Calculator.add()");
             logger.debug("  → Calculation executed, result = {}", result);
         }
-        
+
         @Override
         public String description() {
             return "I press the add button";
         }
     }
-    
+
     private class WhenSubtract implements StepCommand {
         @Override
         public StepKeyword keyword() {
             return StepKeyword.WHEN;
         }
-        
+
         @Override
         public void execute(StepContext context) {
             int result = calculator.subtract();
@@ -131,19 +132,19 @@ public class CalculatorAcceptanceTest extends AcceptanceTest {
             logger.debug("  └─ Calculator.subtract()");
             logger.debug("  → Calculation executed, result = {}", result);
         }
-        
+
         @Override
         public String description() {
             return "I press the subtract button";
         }
     }
-    
+
     private class WhenReset implements StepCommand {
         @Override
         public StepKeyword keyword() {
             return StepKeyword.WHEN;
         }
-        
+
         @Override
         public void execute(StepContext context) {
             calculator.reset();
@@ -151,54 +152,54 @@ public class CalculatorAcceptanceTest extends AcceptanceTest {
             logger.debug("  └─ Calculator.reset()");
             logger.debug("  → Calculator reset to initial state");
         }
-        
+
         @Override
         public String description() {
             return "I start fresh";
         }
     }
-    
+
     private class ThenResultIs implements StepCommand {
         private final int expected;
-        
+
         ThenResultIs(int expected) {
             this.expected = expected;
         }
-        
+
         @Override
         public StepKeyword keyword() {
             return StepKeyword.THEN;
         }
-        
+
         @Override
         public void execute(StepContext context) {
-            int actual = context.get("result", Integer.class);
+            int actual = context.get("result");
             var logger = LoggerFactory.getLogger(getClass());
             logger.debug("  └─ Calculator.getResult()");
             logger.debug("  ✓ Asserting result = {}", expected);
             assertThat(actual)
-                .as("Calculator result should be correct")
-                .isEqualTo(expected);
+                    .as("Calculator result should be correct")
+                    .isEqualTo(expected);
         }
-        
+
         @Override
         public String description() {
             return "the result should be " + expected;
         }
     }
-    
+
     private class ThenDisplayShows implements StepCommand {
         private final int expected;
-        
+
         ThenDisplayShows(int expected) {
             this.expected = expected;
         }
-        
+
         @Override
         public StepKeyword keyword() {
             return StepKeyword.THEN;
         }
-        
+
         @Override
         public void execute(StepContext context) {
             int display = calculator.getDisplay();
@@ -206,52 +207,13 @@ public class CalculatorAcceptanceTest extends AcceptanceTest {
             logger.debug("  └─ Calculator.getDisplay()");
             logger.debug("  ✓ Asserting display = {}", expected);
             assertThat(display)
-                .as("Display should show zero after reset")
-                .isEqualTo(expected);
+                    .as("Display should show zero after reset")
+                    .isEqualTo(expected);
         }
-        
+
         @Override
         public String description() {
             return "the display should show " + expected;
-        }
-    }
-    
-    // Simple Calculator implementation for demo
-    static class Calculator {
-        private int firstNumber;
-        private int secondNumber;
-        private int result;
-        
-        public void enter(int number) {
-            if (firstNumber == 0) {
-                firstNumber = number;
-            } else {
-                secondNumber = number;
-            }
-        }
-        
-        public int add() {
-            result = firstNumber + secondNumber;
-            return result;
-        }
-        
-        public int subtract() {
-            result = firstNumber - secondNumber;
-            return result;
-        }
-        
-        public int getResult() {
-            return result;
-        }
-        
-        public int getDisplay() {
-            return firstNumber;
-        }
-        
-        public void reset() {
-            firstNumber = 0;
-            secondNumber = 0;
-            result = 0;
         }
     }
 }
