@@ -24,11 +24,18 @@ import java.util.concurrent.ConcurrentHashMap;
 public class TypeSafeMapMap implements ITypeSafeMapMap {
     private final Map<Type, Map<?, ?>> map = new ConcurrentHashMap<>();
     private final Map<Object, Type> keyToType = new ConcurrentHashMap<>();
+    private final Validators validators = new Validators();
 
     @Override
     @SuppressWarnings("unchecked")
     public <K, V> void put(@Nonnull K key, @Nonnull V value) {
-        Type valueType = value.getClass();
+        put(key, value, (Class<V>) value.getClass());
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <K, V> void put(@Nonnull K key, @Nonnull V value, @Nonnull Class<V> storageType) {
+        Type valueType = storageType;
 
         // If key already exists with a different type, remove the old entry
         keyToType.merge(key, valueType, (existingType, newType) -> {
@@ -44,49 +51,18 @@ public class TypeSafeMapMap implements ITypeSafeMapMap {
         // Get or create the submap for this type
         Map<K, V> submap = (Map<K, V>) map.computeIfAbsent(valueType, k -> new ConcurrentHashMap<>());
         submap.put(key, value);
-
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     @Nonnull
     public <K, V> V get(@Nonnull K key, @Nonnull Class<V> type) {
-        Map<K, V> submap = (Map<K, V>) map.get(type);
-        if (submap == null) {
-            throw new IllegalStateException(
-                    String.format("No values of type %s were found", type.getSimpleName()));
-        }
-        Object value = submap.get(key);
-        if (value == null) {
-            throw new IllegalStateException(
-                    String.format("Key not found: %s (type: %s)", key, type.getSimpleName()));
-        }
-        return (V) value;
+        return validators.requireValue(key, type);
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     @Nonnull
     public <K, V> V get(@Nonnull K key) {
-        // Look up the type for this key using the index
-        Type valueType = keyToType.get(key);
-        if (valueType == null) {
-            throw new IllegalStateException(String.format("Key not found: %s", key));
-        }
-
-        // Get the submap for this type
-        Map<K, V> submap = (Map<K, V>) map.get(valueType);
-        if (submap == null) {
-            throw new IllegalStateException(
-                    String.format("No values of type %s are stored in context", valueType));
-        }
-
-        // Get the value from the submap
-        Object value = submap.get(key);
-        if (value == null) {
-            throw new IllegalStateException(String.format("Context key not found: %s", key));
-        }
-        return (V) value;
+        return validators.requireValue(key);
     }
 
     @Override
@@ -127,5 +103,35 @@ public class TypeSafeMapMap implements ITypeSafeMapMap {
     public void clear() {
         map.clear();
         keyToType.clear();
+    }
+
+    private class Validators {
+        @Nonnull
+        @SuppressWarnings("unchecked")
+        <K, V> Map<K, V> requireSubmap(Class<?> type) {
+            Map<K, V> submap = (Map<K, V>) map.get(type);
+            if (submap == null)
+                throw new IllegalStateException(
+                        String.format("No values of type %s were found", type.getSimpleName()));
+            return submap;
+        }
+
+        @Nonnull
+        <K, V> V requireValue(@Nonnull K key, @Nonnull Class<?> type) {
+            Map<K, V> submap = requireSubmap(type);
+            V value = submap.get(key);
+            if (value == null)
+                throw new IllegalStateException(
+                        String.format("Key not found: %s (type: %s)", key, type.getSimpleName()));
+            return value;
+        }
+
+        @Nonnull
+        <K, V> V requireValue(@Nonnull K key) {
+            Type valueType = keyToType.get(key);
+            if (valueType == null)
+                throw new IllegalStateException(String.format("Key not found: %s", key));
+            return requireValue(key, (Class<?>) valueType);
+        }
     }
 }

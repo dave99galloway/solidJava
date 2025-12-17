@@ -23,6 +23,22 @@ public interface ITypeSafeMapMap {
     <K, V> void put(@Nonnull K key, @Nonnull V value);
 
     /**
+     * Store a value under an explicitly specified type.
+     * 
+     * Use this overload when storing values as an interface, abstract class, or
+     * other supertype that differs from the runtime type. This allows type-safe
+     * retrieval using the specified type rather than the actual runtime type.
+     * 
+     * @param key         the key to store the value under (must not be null)
+     * @param value       the value to store (must not be null)
+     * @param storageType the type to use for storage and retrieval (must not be
+     *                    null)
+     * @param <K>         the type of the key
+     * @param <V>         the type of the value
+     */
+    <K, V> void put(@Nonnull K key, @Nonnull V value, @Nonnull Class<V> storageType);
+
+    /**
      * Retrieve a value by key and type.
      * 
      * @param key  the key to retrieve (must not be null)
