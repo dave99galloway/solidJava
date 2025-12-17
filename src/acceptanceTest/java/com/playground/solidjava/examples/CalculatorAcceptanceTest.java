@@ -25,32 +25,32 @@ public class CalculatorAcceptanceTest extends AcceptanceTest {
 
     @Test
     void shouldAddTwoPositiveNumbers() {
-        given(new GivenCalculator())
-                .and(new GivenEnterNumber(5))
-                .and(new GivenEnterNumber(3))
-                .when(new WhenAdd())
-                .then(new ThenResultIs(8));
+        given(new CreateCalculator())
+                .and(new EnterNumber(5))
+                .and(new EnterNumber(3))
+                .when(new Add())
+                .then(new ResultIs(8));
     }
 
     @Test
     void shouldSubtractNumbers() {
-        given(new GivenCalculator())
-                .and(new GivenEnterNumber(10))
-                .and(new GivenEnterNumber(4))
-                .when(new WhenSubtract())
-                .then(new ThenResultIs(6));
+        given(new CreateCalculator())
+                .and(new EnterNumber(10))
+                .and(new EnterNumber(4))
+                .when(new Subtract())
+                .then(new ResultIs(6));
     }
 
     @Test
     void shouldHandleZero() {
-        given(new GivenCalculator())
-                .when(new WhenReset())
-                .then(new ThenDisplayShows(0));
+        given(new CreateCalculator())
+                .when(new Reset())
+                .then(new DisplayShows(0));
     }
 
     // Command implementations
 
-    private class GivenCalculator implements StepAction {
+    private class CreateCalculator implements StepAction {
         @Override
         public void execute(StepContext context) {
             calculator = new Calculator();
@@ -64,10 +64,10 @@ public class CalculatorAcceptanceTest extends AcceptanceTest {
         }
     }
 
-    private class GivenEnterNumber implements StepAction {
+    private class EnterNumber implements StepAction {
         private final int number;
 
-        GivenEnterNumber(int number) {
+        EnterNumber(int number) {
             this.number = number;
         }
 
@@ -86,7 +86,7 @@ public class CalculatorAcceptanceTest extends AcceptanceTest {
         }
     }
 
-    private class WhenAdd implements StepAction {
+    private class Add implements StepAction {
         @Override
         public void execute(StepContext context) {
             int result = calculator.add();
@@ -102,7 +102,7 @@ public class CalculatorAcceptanceTest extends AcceptanceTest {
         }
     }
 
-    private class WhenSubtract implements StepAction {
+    private class Subtract implements StepAction {
         @Override
         public void execute(StepContext context) {
             int result = calculator.subtract();
@@ -118,7 +118,7 @@ public class CalculatorAcceptanceTest extends AcceptanceTest {
         }
     }
 
-    private class WhenReset implements StepAction {
+    private class Reset implements StepAction {
         @Override
         public void execute(StepContext context) {
             calculator.reset();
@@ -133,10 +133,10 @@ public class CalculatorAcceptanceTest extends AcceptanceTest {
         }
     }
 
-    private class ThenResultIs implements StepAction {
+    private class ResultIs implements StepAction {
         private final int expected;
 
-        ThenResultIs(int expected) {
+        ResultIs(int expected) {
             this.expected = expected;
         }
 
@@ -157,10 +157,10 @@ public class CalculatorAcceptanceTest extends AcceptanceTest {
         }
     }
 
-    private class ThenDisplayShows implements StepAction {
+    private class DisplayShows implements StepAction {
         private final int expected;
 
-        ThenDisplayShows(int expected) {
+        DisplayShows(int expected) {
             this.expected = expected;
         }
 
