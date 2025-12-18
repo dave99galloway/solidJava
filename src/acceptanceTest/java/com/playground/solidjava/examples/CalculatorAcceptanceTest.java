@@ -111,13 +111,7 @@ public class CalculatorAcceptanceTest extends AcceptanceTest {
         }
     }
 
-    private class ResultIs implements StepAction {
-        private final int expected;
-
-        ResultIs(int expected) {
-            this.expected = expected;
-        }
-
+    record ResultIs(int expected) implements StepAction {
         @Override
         public void execute(StepContext context) {
             int actual = context.get("result");
@@ -130,15 +124,10 @@ public class CalculatorAcceptanceTest extends AcceptanceTest {
         }
     }
 
-    private class DisplayShows implements StepAction {
-        private final int expected;
-
-        DisplayShows(int expected) {
-            this.expected = expected;
-        }
-
+    record DisplayShows(int expected) implements StepAction {
         @Override
         public void execute(StepContext context) {
+            Calculator calculator = context.get(Calculator.class); 
             assertThat(calculator.getDisplay()).isEqualTo(expected);
         }
 
