@@ -1,7 +1,6 @@
 package com.playground.solidjava.examples;
 
 import com.playground.solidjava.framework.AcceptanceTest;
-import com.playground.solidjava.framework.Step;
 import com.playground.solidjava.framework.StepAction;
 import com.playground.solidjava.framework.StepContext;
 import org.junit.jupiter.api.Test;
@@ -27,9 +26,7 @@ public class CalculatorAcceptanceTest extends AcceptanceTest {
     @Test
     void shouldAddTwoPositiveNumbers() {
         given(new CreateCalculator())
-                .and(ctx -> {
-                    calculator.enter(5);
-                }, "I enter 5")
+                .and(ctx -> calculator.enter(5), "I enter 5")
                 .and(new EnterNumber(3))
                 .when(new Add())
                 .then(new ResultIs(8));
@@ -57,7 +54,7 @@ public class CalculatorAcceptanceTest extends AcceptanceTest {
         @Override
         public void execute(StepContext context) {
             calculator = new Calculator();
-            context.put("calculator", calculator);
+            context.put(calculator);
             LoggerFactory.getLogger(getClass()).debug("  └─ Calculator.create()");
         }
 
@@ -67,20 +64,12 @@ public class CalculatorAcceptanceTest extends AcceptanceTest {
         }
     }
 
-    private class EnterNumber implements StepAction {
-        private final int number;
-
-        EnterNumber(int number) {
-            this.number = number;
-        }
+    record EnterNumber(int number) implements StepAction {
 
         @Override
         public void execute(StepContext context) {
-            calculator.enter(number);
+            context.get(Calculator.class, Calculator.class).enter(number);
             context.put("lastNumber", number);
-            var logger = LoggerFactory.getLogger(getClass());
-            logger.debug("  └─ Calculator.enter({})", number);
-            logger.debug("  → Number stored: {}", number);
         }
 
         @Override
@@ -149,9 +138,7 @@ public class CalculatorAcceptanceTest extends AcceptanceTest {
             var logger = LoggerFactory.getLogger(getClass());
             logger.debug("  └─ Calculator.getResult()");
             logger.debug("  ✓ Asserting result = {}", expected);
-            assertThat(actual)
-                    .as("Calculator result should be correct")
-                    .isEqualTo(expected);
+            assertThat(actual).isEqualTo(expected);
         }
 
         @Override
@@ -173,9 +160,7 @@ public class CalculatorAcceptanceTest extends AcceptanceTest {
             var logger = LoggerFactory.getLogger(getClass());
             logger.debug("  └─ Calculator.getDisplay()");
             logger.debug("  ✓ Asserting display = {}", expected);
-            assertThat(display)
-                    .as("Display should show zero after reset")
-                    .isEqualTo(expected);
+            assertThat(display).isEqualTo(expected);
         }
 
         @Override

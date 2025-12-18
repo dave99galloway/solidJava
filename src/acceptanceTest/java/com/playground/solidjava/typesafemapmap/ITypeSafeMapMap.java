@@ -12,8 +12,20 @@ import java.util.Map;
  * retrieving values, along with utility methods for working with typed submaps.
  */
 public interface ITypeSafeMapMap {
+
     /**
      * Store a value with its type as key.
+     * 
+     * @param <V>   the type of the value
+     * @param value the value to store (must not be null)
+     */
+    @SuppressWarnings("unchecked")
+    default <V> void put(@Nonnull V value) {
+        put((Class<V>) value.getClass(), value);
+    }
+
+    /**
+     * Store a key value pair.
      * 
      * @param key   the key to store the value under (must not be null)
      * @param value the value to store (must not be null)

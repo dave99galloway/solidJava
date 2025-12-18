@@ -1,6 +1,11 @@
 package com.playground.solidjava.framework;
 
+import com.playground.solidjava.typesafemapmap.ITypeSafeMapMap;
 import com.playground.solidjava.typesafemapmap.TypeSafeMapMap;
+
+import java.util.List;
+import java.util.Map;
+
 import javax.annotation.Nonnull;
 
 /**
@@ -9,53 +14,63 @@ import javax.annotation.Nonnull;
  * variables.
  * 
  * Delegates to a TypeSafeMapMap instance for type-safe storage.
- * The type-safe map structure ensures each type gets its own submap,
- * providing compile-time type safety and preventing type mismatches.
  */
-public class StepContext {
+public class StepContext implements ITypeSafeMapMap {
     private final TypeSafeMapMap delegate = new TypeSafeMapMap();
 
-    /**
-     * Store a value in the context for retrieval in subsequent steps.
-     * Convenience method that delegates to the underlying map.
-     */
-    public <T> StepContext put(@Nonnull String key, @Nonnull T value) {
+    @Override
+    public <K, V> void put(@Nonnull K key, @Nonnull V value) {
         delegate.put(key, value);
-        return this;
     }
 
-    /**
-     * Retrieve a value from context with type safety.
-     */
+    @Override
+    public <K, V> void put(@Nonnull K key, @Nonnull V value, @Nonnull Class<V> storageType) {
+        delegate.put(key, value, storageType);
+    }
+
+    @Override
     @Nonnull
-    public <T> T get(@Nonnull String key, @Nonnull Class<T> type) {
+    public <K, V> V get(@Nonnull K key, @Nonnull Class<V> type) {
         return delegate.get(key, type);
     }
 
-    /**
-     * Retrieve a value from context with type inference from the assignment
-     * context.
-     * This allows natural code: {@code int result = context.get("result");}
-     * 
-     * Note: Due to Java's type erasure, each key can store only a single value.
-     * The assignment target type does not affect runtime retrieval; the type is
-     * determined
-     * by what was previously stored with this key.
-     * 
-     * @param key the key to retrieve
-     * @param <T> the type of the value, inferred from context
-     * @return the value stored under the given key
-     * @throws IllegalStateException if the key is not found
-     */
+    @Override
     @Nonnull
-    public <T> T get(@Nonnull String key) {
+    public <K, V> V get(@Nonnull K key) {
         return delegate.get(key);
     }
 
-    /**
-     * Clear all context data.
-     */
+    @Override
+    @Nonnull
+    public <K, V> Map<K, V> allOfType(@Nonnull Class<V> type) {
+        return delegate.allOfType(type);
+    }
+
+    @Override
+    @Nonnull
+    public <V, R> List<R> mapValues(@Nonnull Class<V> type, @Nonnull ValueAction<V, R> action) {
+       return delegate.mapValues(type, action);
+    }
+
+    @Override
+    @Nonnull
+    public <V, R> List<R> mapEntries(@Nonnull Class<V> type, @Nonnull EntryAction<V, R> action) {
+        return delegate.mapEntries(type, action);
+    }
+
+    @Override
+    @Nonnull
+    public <K, V> Map<K, V> mutableEntriesOfType(@Nonnull Class<V> type) {
+        return delegate.mutableEntriesOfType(type);
+    }
+
+    @Override
+    public void clear() {
+        delegate.clear();
+    }
+
     public void reset() {
         delegate.clear();
     }
+
 }
