@@ -1,10 +1,13 @@
 package com.playground.solidjava.framework;
 
 /**
- * A step action encapsulates the core behavior of a test step.
+ * A step action encapsulates the behavior and description of a test step.
  * 
  * Implementations are keyword-agnostic; the keyword is determined by which
  * method (given, when, then, and, but) the action is passed to.
+ * 
+ * For simple steps that don't need reuse, use the Step functional interface
+ * with an inline lambda instead of creating a class.
  */
 public interface StepAction {
     /**

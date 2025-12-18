@@ -1,6 +1,7 @@
 package com.playground.solidjava.examples;
 
 import com.playground.solidjava.framework.AcceptanceTest;
+import com.playground.solidjava.framework.Step;
 import com.playground.solidjava.framework.StepAction;
 import com.playground.solidjava.framework.StepContext;
 import org.junit.jupiter.api.Test;
@@ -26,7 +27,9 @@ public class CalculatorAcceptanceTest extends AcceptanceTest {
     @Test
     void shouldAddTwoPositiveNumbers() {
         given(new CreateCalculator())
-                .and(new EnterNumber(5))
+                .and(ctx -> {
+                    calculator.enter(5);
+                }, "I enter 5")
                 .and(new EnterNumber(3))
                 .when(new Add())
                 .then(new ResultIs(8));

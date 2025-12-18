@@ -85,10 +85,24 @@ public abstract class AcceptanceTest {
     }
 
     /**
+     * Execute a GIVEN step with inline logic.
+     */
+    public AcceptanceTest given(Step step, String description) {
+        return executeStep(StepKeyword.GIVEN, wrapStep(step, description));
+    }
+
+    /**
      * Execute a WHEN step action and log it.
      */
     public AcceptanceTest when(StepAction action) {
         return executeStep(StepKeyword.WHEN, action);
+    }
+
+    /**
+     * Execute a WHEN step with inline logic.
+     */
+    public AcceptanceTest when(Step step, String description) {
+        return executeStep(StepKeyword.WHEN, wrapStep(step, description));
     }
 
     /**
@@ -99,10 +113,24 @@ public abstract class AcceptanceTest {
     }
 
     /**
+     * Execute a THEN step with inline logic.
+     */
+    public AcceptanceTest then(Step step, String description) {
+        return executeStep(StepKeyword.THEN, wrapStep(step, description));
+    }
+
+    /**
      * Execute an AND step action and log it.
      */
     public AcceptanceTest and(StepAction action) {
         return executeStep(StepKeyword.AND, action);
+    }
+
+    /**
+     * Execute an AND step with inline logic.
+     */
+    public AcceptanceTest and(Step step, String description) {
+        return executeStep(StepKeyword.AND, wrapStep(step, description));
     }
 
     /**
@@ -113,9 +141,33 @@ public abstract class AcceptanceTest {
     }
 
     /**
+     * Execute a BUT step with inline logic.
+     */
+    public AcceptanceTest but(Step step, String description) {
+        return executeStep(StepKeyword.BUT, wrapStep(step, description));
+    }
+
+    /**
      * Log a keyword step at INFO level.
      */
     private void logKeyword(StepKeyword keyword, String description) {
         logger.info("{} {}", keyword.getLabel(), description);
+    }
+
+    /**
+     * Wrap a Step functional interface and description into a StepAction.
+     */
+    private static StepAction wrapStep(Step step, String description) {
+        return new StepAction() {
+            @Override
+            public void execute(StepContext context) throws Exception {
+                step.execute(context);
+            }
+
+            @Override
+            public String description() {
+                return description;
+            }
+        };
     }
 }
