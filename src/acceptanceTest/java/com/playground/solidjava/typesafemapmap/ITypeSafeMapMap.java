@@ -64,6 +64,15 @@ public interface ITypeSafeMapMap {
     <K, V> V get(@Nonnull K key, @Nonnull Class<V> type);
 
     /**
+     * Retrieve a value where the key is the Class of the value.
+     * A convenience overload for getting an object by its class type.
+     */
+    @Nonnull
+    default <V> V get(@Nonnull Class<V> key) {
+        return get(key, key);
+    }
+
+    /**
      * Retrieve a value by key, with type inferred from the assignment context.
      * This allows natural type inference: {@code int value = get("key");}
      * 

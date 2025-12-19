@@ -24,7 +24,7 @@ public final class WithCalculator {
         return new StepAction() {
             @Override
             public void execute(StepContext context) {
-                context.get(Calculator.class, Calculator.class).enter(number);
+                context.get(Calculator.class).enter(number);
             }
 
             @Override
@@ -42,7 +42,7 @@ public final class WithCalculator {
         return new StepAction() {
             @Override
             public void execute(StepContext context) {
-                int result = context.get(Calculator.class, Calculator.class).add();
+                int result = context.get(Calculator.class).add();
                 context.put("result", result);
             }
 
@@ -61,7 +61,7 @@ public final class WithCalculator {
         return new StepAction() {
             @Override
             public void execute(StepContext context) {
-                int result = context.get(Calculator.class, Calculator.class).subtract();
+                int result = context.get(Calculator.class).subtract();
                 context.put("result", result);
             }
 
@@ -79,7 +79,7 @@ public final class WithCalculator {
         return new StepAction() {
             @Override
             public void execute(StepContext context) {
-                context.get(Calculator.class, Calculator.class).reset();
+                context.get(Calculator.class).reset();
             }
 
             @Override
@@ -96,7 +96,7 @@ public final class WithCalculator {
         return new StepAction() {
             @Override
             public void execute(StepContext context) {
-                int actual = context.get(Calculator.class, Calculator.class).getDisplay();
+                int actual = context.get(Calculator.class).getDisplay();
                 assertThat(actual).isEqualTo(expected);
             }
 
