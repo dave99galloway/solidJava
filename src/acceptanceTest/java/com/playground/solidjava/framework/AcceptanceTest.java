@@ -85,6 +85,25 @@ public abstract class AcceptanceTest {
     }
 
     /**
+     * A new GIVEN step that initializes the context with a primary object 
+     * (e.g., the System Under Test), using a generic parameter for type safety.
+     */
+    public <T> AcceptanceTest given(T initialObject, String description) {
+        StepAction action = new StepAction() {
+            @Override
+            public void execute(StepContext context) {
+                context.put(initialObject);
+            }
+
+            @Override
+            public String description() {
+                return description;
+            }
+        };
+        return executeStep(StepKeyword.GIVEN, action);
+    }
+
+    /**
      * Execute a GIVEN step with inline logic.
      */
     public AcceptanceTest given(Step step, String description) {

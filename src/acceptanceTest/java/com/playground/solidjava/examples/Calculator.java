@@ -1,7 +1,7 @@
 package com.playground.solidjava.examples;
 
 // Simple Calculator implementation for demo
-class Calculator {
+public class Calculator {
     private int firstNumber;
     private int secondNumber;
     private int result;
